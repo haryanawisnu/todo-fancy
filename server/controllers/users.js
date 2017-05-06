@@ -14,13 +14,14 @@ module.exports = {
   },
   create: (req, res, next) => {
     User.create({
-      'local.username': req.body.username,
-      'local.password': passwordHash.generate(req.body.password),
-      'local.name': req.body.name,
-      'local.email': req.body.email,
-      'local.phone': req.body.phone,
-      'local.address': req.body.address,
-      'local.role': req.body.role
+      token: req.body.token || '',
+      username: req.body.username,
+      password: passwordHash.generate(req.body.password),
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      address: req.body.address,
+      role: req.body.role
     }, function(error, result) {
       if (result) {
         res.send(result);
@@ -47,17 +48,24 @@ module.exports = {
       _id: id
     }).exec(function(err, result) {
       if (result) {
+        let password;
+        if (req.body.password) {
+          password = passwordHash.generate(req.body.password);
+        } else {
+          password = result.password;
+        }
         User.update({
           _id: id
         }, {
           $set: {
             username: req.body.username || result.username,
-            password: passwordHash.generate(req.body.password) || result.password,
+            password: password,
             name: req.body.name || result.name,
-            name: req.body.phone || result.phone,
-            name: req.body.address || result.address,
-            name: req.body.email || result.name,
-            role: req.body.role || result.role
+            phone: req.body.phone || result.phone,
+            address: req.body.address || result.address,
+            email: req.body.email || result.email,
+            role: req.body.role || result.role,
+            token: req.body.token || result.token
           }
         }, function(err, result) {
           if (result) {
@@ -77,13 +85,14 @@ module.exports = {
     }).exec(function(err, result) {
       if (!result) {
         User.create({
-          'local.username': req.body.username,
-          'local.password': passwordHash.generate(req.body.password),
-          'local.name': req.body.name,
-          'local.email': req.body.email,
-          'local.phone': req.body.phone,
-          'local.address': req.body.address,
-          'local.role': req.body.role
+          token: req.body.token || '',
+          username: req.body.username,
+          password: passwordHash.generate(req.body.password),
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          address: req.body.address,
+          role: req.body.role
         }, function(error, result) {
           if (result) {
             res.send(result);
