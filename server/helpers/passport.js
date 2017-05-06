@@ -2,35 +2,7 @@ var User = require('../models/users');
 require('dotenv').config()
 
 module.exports = {
-  signup: (req, username, password, done) => {
-    console.log(password);
-    process.nextTick(function() {
-      console.log('---');
-      User.find({
-        'local.username': username
-      }, function(err, user) {
-        if (err)
-          console.log('notfound');
-        return done(err);
-        if (user) {
-          console.log('udah ada');
-          return done(err);
-        } else {
-          console.log('ga ada');
-          var newUser = new User();
-          newUser.local.username = username;
-          newUser.local.password = newUser.generateHash(password);
 
-          newUser.save(function(err) {
-            if (err)
-              throw err;
-            return done(null, newUser);
-          })
-        }
-      })
-
-    });
-  }
 }
 
 // passport.use('local-login', new LocalStrategy({

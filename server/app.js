@@ -3,10 +3,9 @@ var app = express();
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var mongoose = require('mongoose');
-var flash = require('connect-flash');
 var index = require('./routes/index');
 var users = require('./routes/users');
-var strategy = require('./helpers/passport');
+var user = require('./controllers/users');
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -18,15 +17,9 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-passport.use('local-signup', new LocalStrategy({
-  usernameField: 'username',
-  passwordField: 'password',
-  passReqToCallback: true,
-  session: false
-}, strategy.signup));
+passport.use(new LocalStrategy(user.signin));
 
 app.use(passport.initialize());
-app.use(flash());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({

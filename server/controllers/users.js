@@ -1,6 +1,6 @@
 var User = require('../models/users');
-var passwordHash = require('password-hash');
 var jwthelpers = require('../helpers/jwtHelpers');
+var passwordHash = require('password-hash');
 
 module.exports = {
   getall: (req, res, next) => {
@@ -8,21 +8,24 @@ module.exports = {
       if (result) {
         res.json(result);
       } else {
-        res.send(`ERR getall :\n ${err}`);
+        res.send(`Error get : ${err}`);
       }
     });
   },
   create: (req, res, next) => {
     User.create({
-      name: req.body.name,
-      username: req.body.username,
-      password: passwordHash.generate(req.body.password),
-      role: req.body.role
+      'local.username': req.body.username,
+      'local.password': passwordHash.generate(req.body.password),
+      'local.name': req.body.name,
+      'local.email': req.body.email,
+      'local.phone': req.body.phone,
+      'local.address': req.body.address,
+      'local.role': req.body.role
     }, function(error, result) {
       if (result) {
-        res.json(result);
+        res.send(result);
       } else {
-        res.send(`ERR input :\n ${error}`);
+        res.send(`Error create : ${error}`);
       }
     });
   },
@@ -34,7 +37,7 @@ module.exports = {
       if (!err) {
         res.send(`Success remove with id ${id}`);
       } else {
-        res.send(`ERR input :\n ${error}`);
+        res.send(`Error remove with id ${id}`);
       }
     });
   },
@@ -48,36 +51,50 @@ module.exports = {
           _id: id
         }, {
           $set: {
-            name: req.body.name || result.name,
             username: req.body.username || result.username,
             password: passwordHash.generate(req.body.password) || result.password,
+            name: req.body.name || result.name,
+            name: req.body.phone || result.phone,
+            name: req.body.address || result.address,
+            name: req.body.email || result.name,
             role: req.body.role || result.role
           }
         }, function(err, result) {
           if (result) {
-            res.json(result);
+            res.send(result);
           } else {
-            res.send(`ERR Update :\n ${err}`);
+            res.send(`Error update : ${err}`);
           }
         });
       } else {
-        res.send(`ERR getall :\n ${err}`);
+        res.send(`Error findupdate : ${err}`);
       }
     });
   },
   signup: (req, res, next) => {
-    User.create({
-      name: req.body.name,
-      username: req.body.username,
-      password: passwordHash.generate(req.body.password),
-      role: req.body.role
-    }, function(error, result) {
-      if (result) {
-        res.json(result);
-      } else {
-        res.send(`ERR input :\n ${error}`);
+    User.findOne({
+      'local.username': req.body.username
+    }).exec(function(err, result) {
+      if (!result) {
+        User.create({
+          'local.username': req.body.username,
+          'local.password': passwordHash.generate(req.body.password),
+          'local.name': req.body.name,
+          'local.email': req.body.email,
+          'local.phone': req.body.phone,
+          'local.address': req.body.address,
+          'local.role': req.body.role
+        }, function(error, result) {
+          if (result) {
+            res.send(result);
+          } else {
+            res.send(`Error signup : ${error}`);
+          }
+        });
+      } else if (result) {
+        res.send(`Username already exist`);
       }
-    });
+    })
   },
   signin: (username, password, cb) => {
     User.findOne({
