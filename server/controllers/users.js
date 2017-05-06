@@ -17,10 +17,10 @@ module.exports = {
       token: req.body.token || '',
       username: req.body.username,
       password: passwordHash.generate(req.body.password),
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      address: req.body.address,
+      name: req.body.name || '',
+      email: req.body.email || '',
+      phone: req.body.phone || '',
+      address: req.body.address || '',
       role: req.body.role
     }, function(error, result) {
       if (result) {
@@ -88,10 +88,10 @@ module.exports = {
           token: req.body.token || '',
           username: req.body.username,
           password: passwordHash.generate(req.body.password),
-          name: req.body.name,
-          email: req.body.email,
-          phone: req.body.phone,
-          address: req.body.address,
+          name: req.body.name || '',
+          email: req.body.email || '',
+          phone: req.body.phone || '',
+          address: req.body.address || '',
           role: req.body.role
         }, function(error, result) {
           if (result) {
