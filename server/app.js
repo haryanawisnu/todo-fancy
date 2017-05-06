@@ -5,6 +5,7 @@ var passport = require('passport');
 var mongoose = require('mongoose');
 var index = require('./routes/index');
 var users = require('./routes/users');
+var todos = require('./routes/todos');
 var user = require('./controllers/users');
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -35,5 +36,6 @@ app.use(function(req, res, next) {
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/todos', todos);
 
 app.listen(3000)
