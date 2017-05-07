@@ -4,12 +4,9 @@ var todoSchema = new Schema({
   title: String,
   description: String,
   status: Boolean,
+  date: Date,
   created: Date,
-  updated: Date,
-  user: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  }]
+  updated: Date
 });
 var Todo = mongoose.model('Todo', todoSchema);
 

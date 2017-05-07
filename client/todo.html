@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Todo</title>
+  <link rel='stylesheet prefetch' href='https://www.google.com/fonts#UsePlace:use/Collection:Roboto:400,300,100,500'>
+  <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css'>
+  <link rel='stylesheet prefetch' href='https://www.google.com/fonts#UsePlace:use/Collection:Roboto+Slab:400,700,300,100'>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <!-- Bootstrap Core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="css/sb-admin.css" rel="stylesheet">
+
+  <!-- Morris Charts CSS -->
+  <link href="css/plugins/morris.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body>
+
+  <div id="wrapper">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+        <a class="navbar-brand" href="#">SB Admin</a>
+      </div>
+      <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav side-nav">
+          <li class="active">
+            <a href="index.html"><i class="fa fa-fw fa-dashboard"></i>Home</a>
+          </li>
+          <li>
+            <a href="tables.html"><i class="fa fa-fw fa-table"></i>Profile</a>
+          </li>
+          <li>
+            <a href="forms.html"><i class="fa fa-fw fa-edit"></i>Logout</a>
+          </li>
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+
+    <div id="page-wrapper">
+
+      <div class="container-fluid">
+
+        <!-- Page Heading -->
+
+        <div class="row">
+          <h1 class="page-header">Todo</h1>
+          <!-- panel preview -->
+          <div class="col-sm-5">
+            <h4>Add Todo:</h4>
+            <div class="panel panel-default">
+              <div class="panel-body form-horizontal payment-form">
+                <div class="form-group">
+                  <label for="concept" class="col-sm-3 control-label">Title</label>
+                  <div class="col-sm-9">
+                    <input v-model="title" type="text" class="form-control" id="concept" name="concept">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="description" class="col-sm-3 control-label">Description</label>
+                  <div class="col-sm-9">
+                    <input v-model="description" type="textarea" class="form-control" id="description" name="description" maxlength="140" rows="7">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="status" class="col-sm-3 control-label">Status</label>
+                  <div class="col-sm-9">
+                    <select v-model="status" class="form-control" id="status" name="status">
+                                <option v-bind:value="{ value: true }">Completed</option>
+                                <option v-bind:value="{ value: false }">Uncompleted</option>
+                            </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="date" class="col-sm-3 control-label">Date</label>
+                  <div class="col-sm-9">
+                    <input v-model="dateTodo" type="date" class="form-control" id="date" name="date">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12 text-right">
+                    <a v-on:click="saveData()" class="btn btn-default preview-add-button">
+                      <span class="glyphicon glyphicon-plus"></span> Add
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- / panel preview -->
+          <div class="col-sm-7">
+            <h4>Preview:</h4>
+            <div class="row">
+              <div class="col-xs-12">
+                <div class="table-responsive">
+                  <table class="table preview-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tr v-for="data in list_data">
+                      <td>{{data.title}}</td>
+                      <td>{{data.description}}</td>
+                      <td>{{data.status}}</td>
+                      <td>{{data.date}}</td>
+                      <td><a v-on:click="editData(data)" class="btn btn-danger">Edit</a></td>
+                      <!-- <td><a v-on:click="delete(data)" class="btn btn-link">Delete</a></td> -->
+                    </tr>
+                    <!-- preview content goes here-->
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+
+    </div>
+    <!-- /#page-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- jQuery -->
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+  <script>
+    var app = new Vue({
+      el: '#wrapper',
+      data: {
+        title: '',
+        description: '',
+        status: '',
+        dateTodo: '',
+        list_data: []
+      },
+      methods: {
+        editData: function(data) {
+          // var token = localStorage.getItem('token');
+          // axios.get('http://localhost:3000/users/590f78f0cd7f6034fbb6abe2')
+          //   .then(function(response) {
+          //     app.list_data = response.data.listTodo;
+          //   })
+          //   .catch(function(error) {
+          //     console.log(error);
+          //   });
+          let temp = data.date.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
+          app.title = data.title;
+          app.description = data.description;
+          app.status = data.status;
+          app.dateTodo = temp;
+        },
+        saveData: function() {
+          // var token = localStorage.getItem('token');
+          console.log(app.status.value);
+          axios.post('http://localhost:3000/todos', {
+              // username: data.item_id,
+              // password: data.item_name,
+              title: app.title,
+              description: app.description,
+              status: app.status.value,
+              date: app.dateTodo,
+              id: '590f78f0cd7f6034fbb6abe2'
+
+            })
+            .then(function(response) {
+              console.log(response);
+              location.reload();
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+        },
+        seedData: function() {
+          // var token = localStorage.getItem('token');
+          axios.get('http://localhost:3000/users/590f78f0cd7f6034fbb6abe2')
+            .then(function(response) {
+              app.list_data = response.data.listTodo;
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+        }
+      },
+      created: function() {
+        this.seedData();
+      }
+    })
+  </script>
+</body>
+
+</html>
+> >

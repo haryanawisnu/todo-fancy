@@ -1,8 +1,9 @@
 var Todo = require('../models/todos');
+var User = require('../models/users');
+var mongoose = require('mongoose');
 module.exports = {
   getall: (req, res, next) => {
     Todo.find()
-      .populate('user')
       .exec(function(err, result) {
         if (result) {
           res.json(result);
@@ -15,14 +16,26 @@ module.exports = {
     Todo.create({
         title: req.body.title,
         description: req.body.description,
-        user: req.body.user,
-        status: false,
+        status: req.body.status,
+        date: req.body.date,
         created: new Date().toISOString(),
         updated: ''
       },
       function(error, result) {
         if (result) {
-          res.json(result);
+          User.findByIdAndUpdate(req.body.id, {
+              $push: {
+                listTodo: result
+              }
+            }, {
+              new: true
+            })
+            .exec((err) => {
+              if (err)
+                res.send(err)
+              else
+                res.json(result)
+            }) // end exec
         } else {
           res.send(`Error input :\n ${error}`);
         }

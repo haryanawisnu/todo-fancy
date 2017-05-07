@@ -4,7 +4,19 @@ var passwordHash = require('password-hash');
 
 module.exports = {
   getall: (req, res, next) => {
-    User.find().exec(function(err, result) {
+    User.find()
+      .populate('listTodo').exec(function(err, result) {
+        if (result) {
+          res.json(result);
+        } else {
+          res.send(`Error get : ${err}`);
+        }
+      });
+  },
+  getone: (req, res, next) => {
+    User.findOne({
+      _id: req.params.id
+    }).populate('listTodo').exec(function(err, result) {
       if (result) {
         res.json(result);
       } else {
@@ -14,6 +26,7 @@ module.exports = {
   },
   create: (req, res, next) => {
     User.create({
+      id: req.body.id || '',
       token: req.body.token || '',
       username: req.body.username,
       password: passwordHash.generate(req.body.password),
