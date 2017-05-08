@@ -66,8 +66,8 @@ module.exports = {
             title: req.body.title || result.title,
             description: req.body.description || result.description,
             status: req.body.status || result.status,
-            user: req.body.user || result.user,
-            updated: new Date().toISOString(),
+            date: req.body.date || result.date,
+            updated: new Date().toISOString()
           }
         }, function(err, result) {
           if (result) {

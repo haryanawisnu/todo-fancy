@@ -133,7 +133,8 @@ module.exports = {
           cb(null, {
             success: true,
             message: 'Enjoy your token!',
-            token: jwthelpers.sign(result)
+            token: jwthelpers.sign(result),
+            data: result
           });
         } else {
           cb({
