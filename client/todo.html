@@ -45,7 +45,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-        <a class="navbar-brand" href="#">SB Admin</a>
+        <a class="navbar-brand" href="#">{{nama}}</a>
       </div>
       <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
       <div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -54,10 +54,10 @@
             <a href="index.html"><i class="fa fa-fw fa-dashboard"></i>Home</a>
           </li>
           <li>
-            <a href="tables.html"><i class="fa fa-fw fa-table"></i>Profile</a>
+            <a href="profile.html"><i class="fa fa-fw fa-table"></i>Profile</a>
           </li>
           <li>
-            <a href="forms.html"><i class="fa fa-fw fa-edit"></i>Logout</a>
+            <a v-on:click="logout"><i class="fa fa-fw fa-edit"></i>Logout</a>
           </li>
         </ul>
       </div>
@@ -93,8 +93,8 @@
                   <label for="status" class="col-sm-3 control-label">Status</label>
                   <div class="col-sm-9">
                     <select v-model="status" class="form-control" id="status" name="status">
-                                <option v-bind:value="{ value: true }">Completed</option>
-                                <option v-bind:value="{ value: false }">Uncompleted</option>
+                                <option v-bind:value="{ isi: true }">Completed</option>
+                                <option v-bind:value="{ isi: false }">Uncompleted</option>
                             </select>
                   </div>
                 </div>
@@ -105,9 +105,18 @@
                   </div>
                 </div>
                 <div class="form-group">
+                  <label for="date" class="col-sm-3 control-label">Time</label>
+                  <div class="col-sm-9">
+                    <input v-model="timeTodo" class="form-control" name="time" id="time" type="time">
+                  </div>
+                </div>
+                <div class="form-group">
                   <div class="col-sm-12 text-right">
                     <a v-on:click="saveData()" class="btn btn-default preview-add-button">
                       <span class="glyphicon glyphicon-plus"></span> Add
+                    </a>
+                    <a v-on:click="updateData()" class="btn btn-default preview-add-button">
+                      <span class="glyphicon glyphicon-save"></span> Save
                     </a>
                   </div>
                 </div>
@@ -135,8 +144,8 @@
                       <td>{{data.description}}</td>
                       <td>{{data.status}}</td>
                       <td>{{data.date}}</td>
-                      <td><a v-on:click="editData(data)" class="btn btn-danger">Edit</a></td>
-                      <!-- <td><a v-on:click="delete(data)" class="btn btn-link">Delete</a></td> -->
+                      <td><a v-on:click="editData(data)" class="btn btn-warning">Edit</a></td>
+                      <td><a v-on:click="deleteData(data._id)" class="btn btn-danger">Delete</a></td>
                     </tr>
                     <!-- preview content goes here-->
                   </table>
@@ -162,39 +171,60 @@
     var app = new Vue({
       el: '#wrapper',
       data: {
+        nama: '',
         title: '',
         description: '',
         status: '',
         dateTodo: '',
+        timeTodo: '',
+        todoId: '',
         list_data: []
       },
       methods: {
-        editData: function(data) {
+        deleteData: function(data) {
           // var token = localStorage.getItem('token');
-          // axios.get('http://localhost:3000/users/590f78f0cd7f6034fbb6abe2')
-          //   .then(function(response) {
-          //     app.list_data = response.data.listTodo;
-          //   })
-          //   .catch(function(error) {
-          //     console.log(error);
-          //   });
-          let temp = data.date.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
+          axios.delete('http://localhost:3000/todos/' + data)
+            .then(function(response) {
+              console.log(response);
+              location.reload();
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+        },
+        updateData: function() {
+          // var token = localStorage.getItem('token');
+          axios.put('http://localhost:3000/todos/' + app.todoId, {
+              title: app.title,
+              description: app.description,
+              status: app.status.isi,
+              date: app.dateTodo
+            })
+            .then(function(response) {
+              console.log(response);
+              location.reload();
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+        },
+        editData: function(data) {
+          // let temp = data.date.toString().replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
           app.title = data.title;
           app.description = data.description;
-          app.status = data.status;
-          app.dateTodo = temp;
+          app.todoId = data._id;
         },
         saveData: function() {
           // var token = localStorage.getItem('token');
-          console.log(app.status.value);
+          let date = app.dateTodo + "T" + app.timeTodo + "Z";
           axios.post('http://localhost:3000/todos', {
               // username: data.item_id,
               // password: data.item_name,
               title: app.title,
               description: app.description,
-              status: app.status.value,
-              date: app.dateTodo,
-              id: '590f78f0cd7f6034fbb6abe2'
+              status: app.status.isi,
+              date: date,
+              id: '590fd45a7cc0a914734a1153'
 
             })
             .then(function(response) {
@@ -207,16 +237,25 @@
         },
         seedData: function() {
           // var token = localStorage.getItem('token');
-          axios.get('http://localhost:3000/users/590f78f0cd7f6034fbb6abe2')
+          axios.get('http://localhost:3000/users/590fd45a7cc0a914734a1153')
             .then(function(response) {
               app.list_data = response.data.listTodo;
             })
             .catch(function(error) {
               console.log(error);
             });
+        },
+        logout: function() {
+          localStorage.removeItem('token');
+          localStorage.removeItem('data');
+          window.location.href = 'login.html';
         }
       },
       created: function() {
+        var data = localStorage.getItem('data');
+        data = JSON.parse(data);
+        this.nama = data.username;
+        // app.id = data._id;
         this.seedData();
       }
     })

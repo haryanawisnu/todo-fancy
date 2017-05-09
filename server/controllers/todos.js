@@ -1,5 +1,6 @@
 var Todo = require('../models/todos');
 var User = require('../models/users');
+var Job = require('../job/todo');
 var mongoose = require('mongoose');
 module.exports = {
   getall: (req, res, next) => {
@@ -23,6 +24,14 @@ module.exports = {
       },
       function(error, result) {
         if (result) {
+          let date = req.body.date;
+          var temp = {
+            time: `00 ${date.slice(14, 16)} ${date.slice(11, 13)} ${date.slice(8, 10)} ${date.slice(5, 7)-1} *`,
+            message: req.body.description,
+            title: req.body.title
+          }
+          console.log(temp);
+          Job.addCron(temp);
           User.findByIdAndUpdate(req.body.id, {
               $push: {
                 listTodo: result

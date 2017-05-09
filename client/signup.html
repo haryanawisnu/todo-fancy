@@ -85,6 +85,9 @@
             addFormError("#user_cnf_password", "The passwords don't match");
             return false; // stop the script if validation is triggered
           }
+          $('#user_password').parents('.form-group').removeClass('has-error');
+          $('#user_cnf_password').parents('.form-group').removeClass('has-error');
+          $('#user_username').parents('.form-group').removeClass('has-error');
           axios.post('http://localhost:3000/users', {
               username: app.user_username,
               password: app.user_password,
