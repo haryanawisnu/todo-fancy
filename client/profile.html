@@ -71,6 +71,10 @@
 
           <div class="col-md-5">
             <div class="form-area">
+
+              <div id="successful_register" class="alert alert-success">
+                <strong>Success Register!</strong>
+              </div>
               <form role="form">
                 <br style="clear:both">
                 <h3 style="margin-bottom: 25px; text-align: center;">Profile</h3>
@@ -116,12 +120,12 @@
         password: '',
         phone: '',
         email: '',
-        address: ''
+        address: '',
+        _id: ''
       },
       methods: {
         saveData: function() {
-          // var token = localStorage.getItem('token');
-          axios.put('http://localhost:3000/users/590fd45a7cc0a914734a1153', {
+          axios.put('http://localhost:3000/users/' + this._id, {
               // username: data.item_id,
               // password: data.item_name,
               phone: app.phone,
@@ -131,14 +135,14 @@
             })
             .then(function(response) {
               console.log(response);
+              $('#successful_register').show();
             })
             .catch(function(error) {
               console.log(error);
             });
         },
         seedData: function() {
-          // var token = localStorage.getItem('token');
-          axios.get('http://localhost:3000/users/590fd45a7cc0a914734a1153')
+          axios.get('http://localhost:3000/users/' + this._id)
             .then(function(response) {
               console.log(response.data);
               app.username = response.data.username;
@@ -155,13 +159,22 @@
           localStorage.removeItem('token');
           localStorage.removeItem('data');
           window.location.href = 'login.html';
+        },
+        validate(params) {
+          if (!params) {
+            this.logout();
+          }
         }
       },
       created: function() {
+        $('#successful_register').hide();
         var data = localStorage.getItem('data');
+        var token = localStorage.getItem('token');
+        this.validate(token);
         data = JSON.parse(data);
         this.username = data.username;
-        // this.id = data._id;
+        console.log(data._id);
+        this._id = data._id;
         this.seedData();
       }
     })

@@ -93,8 +93,8 @@
                   <label for="status" class="col-sm-3 control-label">Status</label>
                   <div class="col-sm-9">
                     <select v-model="status" class="form-control" id="status" name="status">
-                                <option v-bind:value="{ isi: true }">Completed</option>
-                                <option v-bind:value="{ isi: false }">Uncompleted</option>
+                                <option value="true">Completed</option>
+                                <option value="false">Uncompleted</option>
                             </select>
                   </div>
                 </div>
@@ -142,7 +142,8 @@
                     <tr v-for="data in list_data">
                       <td>{{data.title}}</td>
                       <td>{{data.description}}</td>
-                      <td>{{data.status}}</td>
+                      <td v-if="data.status">Complete</td>
+                      <td v-else="data.status">UnComplete</td>
                       <td>{{data.date}}</td>
                       <td><a v-on:click="editData(data)" class="btn btn-warning">Edit</a></td>
                       <td><a v-on:click="deleteData(data._id)" class="btn btn-danger">Delete</a></td>
@@ -178,11 +179,11 @@
         dateTodo: '',
         timeTodo: '',
         todoId: '',
+        iduser: '',
         list_data: []
       },
       methods: {
         deleteData: function(data) {
-          // var token = localStorage.getItem('token');
           axios.delete('http://localhost:3000/todos/' + data)
             .then(function(response) {
               console.log(response);
@@ -193,11 +194,10 @@
             });
         },
         updateData: function() {
-          // var token = localStorage.getItem('token');
           axios.put('http://localhost:3000/todos/' + app.todoId, {
               title: app.title,
               description: app.description,
-              status: app.status.isi,
+              status: app.status,
               date: app.dateTodo
             })
             .then(function(response) {
@@ -209,23 +209,27 @@
             });
         },
         editData: function(data) {
-          // let temp = data.date.toString().replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
+          let date = new Date(data.date);
+          let result1 = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+          let result2 = data.date.slice(11, 16);
+          console.log(data.status);
+          app.dateTodo = result1;
+          app.timeTodo = result2;
+          app.status = data.status;
           app.title = data.title;
           app.description = data.description;
-          app.todoId = data._id;
+          app.todoId = data.iduser;
         },
         saveData: function() {
-          // var token = localStorage.getItem('token');
           let date = app.dateTodo + "T" + app.timeTodo + "Z";
           axios.post('http://localhost:3000/todos', {
               // username: data.item_id,
               // password: data.item_name,
               title: app.title,
               description: app.description,
-              status: app.status.isi,
+              status: app.status,
               date: date,
-              id: '590fd45a7cc0a914734a1153'
-
+              id: app.iduser
             })
             .then(function(response) {
               console.log(response);
@@ -236,8 +240,7 @@
             });
         },
         seedData: function() {
-          // var token = localStorage.getItem('token');
-          axios.get('http://localhost:3000/users/590fd45a7cc0a914734a1153')
+          axios.get('http://localhost:3000/users/' + this.iduser)
             .then(function(response) {
               app.list_data = response.data.listTodo;
             })
@@ -249,13 +252,21 @@
           localStorage.removeItem('token');
           localStorage.removeItem('data');
           window.location.href = 'login.html';
+        },
+        validate(params) {
+          if (!params) {
+            this.logout();
+          }
         }
       },
       created: function() {
         var data = localStorage.getItem('data');
+        var token = localStorage.getItem('token');
+        this.validate(token);
         data = JSON.parse(data);
+        console.log(data._id);
         this.nama = data.username;
-        // app.id = data._id;
+        this.iduser = data._id;
         this.seedData();
       }
     })
